@@ -1,0 +1,52 @@
+# 开发环境配置
+springdoc:
+  paths-to-match: /api/**
+  swagger-ui:
+    operations-sorter: alpha
+spring:
+  mail:
+    # qq邮箱的地址为smtp.163.com，直接填写即可
+    host: smtp.qq.com
+    # 你的qq邮箱
+    username: 2748719496@qq.com
+    # 注意密码是在开启smtp/pop3时自动生成的，记得保存一下，不然就找不到了
+    password: shdptvdwrgyjdegh
+    properties:
+      from: 2748719496@qq.com
+  rabbitmq:
+    addresses: localhost
+    username: admin
+    password: admin
+    virtual-host: /
+  datasource:
+    url: jdbc:mysql://localhost:3306/monitor
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  security:
+    jwt:
+      key: 'abcdefghijklmn'
+      expire: 72
+      limit:
+        base: 10
+        upgrade: 300
+        frequency: 30
+    filter:
+      order: -100
+  web:
+    verify:
+      mail-limit: 60
+    flow:
+      period: 3
+      limit: 50
+      block: 30
+    cors:
+      credentials: false
+      methods: '*'
+      origin: "*"
+  minio:
+    endpoint: 'http://localhost:9999'
+    username: 'minioadmin'
+    password: 'minioadmin'
+  weather:
+    key: 47d29ad789c640c08a537200d9070ca7
