@@ -4,6 +4,10 @@ springdoc:
   swagger-ui:
     operations-sorter: alpha
 spring:
+  influx:
+    url: http://localhost:8086
+    user: SheEagle
+    password: 12345678
   mail:
     # qq邮箱的地址为smtp.163.com，直接填写即可
     host: smtp.qq.com

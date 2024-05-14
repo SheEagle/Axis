@@ -9,6 +9,7 @@ import com.example.entity.vo.request.RuntimeDetailsVO;
 import com.example.mapper.ClientDetailsMapper;
 import com.example.mapper.ClientMapper;
 import com.example.service.ClientService;
+import com.example.utils.InfluxDBUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
@@ -33,6 +34,8 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     @Resource
     ClientDetailsMapper clientDetailsMapper;
+    @Resource
+    InfluxDBUtils influx;
 
     @PostConstruct
     public void initClientCache() {
@@ -86,7 +89,7 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     @Override
     public void updateRuntimeDetails(RuntimeDetailsVO vo, Client client) {
         currentRuntime.put(client.getId(), vo);
-        System.out.println(vo);
+        influx.writeRuntimeData(client.getId(), vo);
     }
 
     private void addClientCache(Client client) {
