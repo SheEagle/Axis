@@ -5,7 +5,7 @@ import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class BaseDetail {
+public class BaseDetails {
     String osArch;
     String osName;
     String osVersion;
@@ -15,5 +15,4 @@ public class BaseDetail {
     double memory;
     double disk;
     String ip;
-
 }

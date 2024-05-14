@@ -1,6 +1,6 @@
 package com.example.utils;
 
-import com.example.entity.BaseDetail;
+import com.example.entity.BaseDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import oshi.SystemInfo;
@@ -22,13 +22,13 @@ public class MonitorUtils {
     private final SystemInfo info = new SystemInfo();
     private final Properties properties = System.getProperties();
 
-    public BaseDetail monitorBaseDetail() {
+    public BaseDetails monitorBaseDetail() {
         OperatingSystem os = info.getOperatingSystem();
         HardwareAbstractionLayer hardware = info.getHardware();
         double memory = hardware.getMemory().getTotal() / 1024.0 / 1024 / 1024;
         double disk = Arrays.stream(File.listRoots()).mapToLong(File::getTotalSpace).sum() / 1024.0 / 1024 / 1024;
         String ip = Objects.requireNonNull(this.findNetworkInterface(hardware)).getIPv4addr()[0];
-        return new BaseDetail()
+        return new BaseDetails()
                 .setOsArch(properties.getProperty("os.arch"))
                 .setOsName(os.getFamily())
                 .setOsVersion(os.getVersionInfo().getVersion())

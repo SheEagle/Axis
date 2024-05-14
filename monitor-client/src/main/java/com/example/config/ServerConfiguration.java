@@ -5,6 +5,8 @@ import com.example.utils.MonitorUtils;
 import com.example.utils.NetUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -19,7 +21,7 @@ import com.alibaba.fastjson2.JSONObject;
 
 @Slf4j
 @Configuration
-public class ServerConfiguration {
+public class ServerConfiguration implements ApplicationRunner {
     @Resource
     NetUtils net;
 
@@ -74,5 +76,11 @@ public class ServerConfiguration {
             }
         }
         return null;
+    }
+
+    @Override
+    public void run(ApplicationArguments args) {
+        log.info("正在向服务端更新基本系统信息...");
+        net.updateBaseDetails(monitor.monitorBaseDetail());
     }
 }
