@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.Client;
 import com.example.entity.dto.ClientDetails;
 import com.example.entity.vo.request.ClientDetailsVO;
+import com.example.entity.vo.request.RuntimeDetailsVO;
 import com.example.mapper.ClientDetailsMapper;
 import com.example.mapper.ClientMapper;
 import com.example.service.ClientService;
@@ -77,6 +78,15 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         } else {
             clientDetailsMapper.insert(details);
         }
+    }
+
+    private Map<Integer, RuntimeDetailsVO> currentRuntime = new ConcurrentHashMap<>();
+
+
+    @Override
+    public void updateRuntimeDetails(RuntimeDetailsVO vo, Client client) {
+        currentRuntime.put(client.getId(), vo);
+        System.out.println(vo);
     }
 
     private void addClientCache(Client client) {

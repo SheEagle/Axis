@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import { logout } from '@/net'
+import {logout} from '@/net'
 import router from "@/router";
 
 function userLogout() {
