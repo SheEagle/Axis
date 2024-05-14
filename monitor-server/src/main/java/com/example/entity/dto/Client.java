@@ -13,6 +13,8 @@ public class Client {
     Integer id;
     String name;
     String token;
+    String location;
+    String node;
     Date registerTime;
 
 }

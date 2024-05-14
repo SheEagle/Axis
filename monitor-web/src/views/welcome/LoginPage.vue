@@ -39,12 +39,7 @@
     <div style="margin-top: 40px">
       <el-button @click="userLogin()" style="width: 270px" type="success" plain>立即登录</el-button>
     </div>
-    <el-divider>
-      <span style="color: grey;font-size: 13px">没有账号</span>
-    </el-divider>
-    <div>
-      <el-button style="width: 270px" @click="router.push('/register')" type="warning" plain>注册账号</el-button>
-    </div>
+
   </div>
 </template>
 
@@ -63,16 +58,16 @@ const form = reactive({
 
 const rules = {
   username: [
-    { required: true, message: '请输入用户名' }
+    {required: true, message: '请输入用户名'}
   ],
   password: [
-    { required: true, message: '请输入密码'}
+    {required: true, message: '请输入密码'}
   ]
 }
 
 function userLogin() {
   formRef.value.validate((isValid) => {
-    if(isValid) {
+    if (isValid) {
       login(form.username, form.password, form.remember, () => router.push("/index"))
     }
   });
