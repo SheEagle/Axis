@@ -1,7 +1,14 @@
 <script setup>
 
-import {Plus} from "@element-plus/icons-vue";
 import PreviewCard from "@/component/PreviewCard.vue";
+import {ref} from "vue";
+import {get} from "@/net";
+
+const list = ref([])
+
+const updateList = () => get('api/monitor/list', data => list.value = data)
+setInterval(updateList, 10000)
+updateList()
 </script>
 
 <template>
@@ -11,9 +18,8 @@ import PreviewCard from "@/component/PreviewCard.vue";
     <el-divider style="margin: 10px 0"></el-divider>
 
     <div class="card-list">
-      <preview-card></preview-card>
-      <preview-card></preview-card>
-      <preview-card></preview-card>
+      <preview-card v-for="item in list" :data="item"></preview-card>
+
     </div>
 
 

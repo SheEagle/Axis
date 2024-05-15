@@ -30,11 +30,11 @@ public class RequestLogFilter extends OncePerRequestFilter {
     SnowflakeIdGenerator generator;
 
     //忽略，不打印日志
-    private final Set<String> ignores = Set.of("/swagger-ui", "/v3/api-docs");
+    private final Set<String> ignores = Set.of("/swagger-ui", "/v3/api-docs", "/monitor/runtime", "/api/monitor/list");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if(this.isIgnoreUrl(request.getServletPath())) {
+        if (this.isIgnoreUrl(request.getServletPath())) {
             filterChain.doFilter(request, response);
         } else {
             long startTime = System.currentTimeMillis();
@@ -48,22 +48,24 @@ public class RequestLogFilter extends OncePerRequestFilter {
 
     /**
      * 判定当前请求url是否不需要日志打印
+     *
      * @param url 路径
      * @return 是否忽略
      */
-    private boolean isIgnoreUrl(String url){
+    private boolean isIgnoreUrl(String url) {
         for (String ignore : ignores) {
-            if(url.startsWith(ignore)) return true;
+            if (url.startsWith(ignore)) return true;
         }
         return false;
     }
 
     /**
      * 请求结束时的日志打印，包含处理耗时以及响应结果
-     * @param wrapper 用于读取响应结果的包装类
+     *
+     * @param wrapper   用于读取响应结果的包装类
      * @param startTime 起始时间
      */
-    public void logRequestEnd(ContentCachingResponseWrapper wrapper, long startTime){
+    public void logRequestEnd(ContentCachingResponseWrapper wrapper, long startTime) {
         long time = System.currentTimeMillis() - startTime;
         int status = wrapper.getStatus();
         String content = status != 200 ?
@@ -73,15 +75,16 @@ public class RequestLogFilter extends OncePerRequestFilter {
 
     /**
      * 请求开始时的日志打印，包含请求全部信息，以及对应用户角色
+     *
      * @param request 请求
      */
-    public void logRequestStart(HttpServletRequest request){
+    public void logRequestStart(HttpServletRequest request) {
         long reqId = generator.nextId();
         MDC.put("reqId", String.valueOf(reqId));
         JSONObject object = new JSONObject();
         request.getParameterMap().forEach((k, v) -> object.put(k, v.length > 0 ? v[0] : null));
         Object id = request.getAttribute(Const.ATTR_USER_ID);
-        if(id != null) {
+        if (id != null) {
             User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             log.info("请求URL: \"{}\" ({}) | 远程IP地址: {} │ 身份: {} (UID: {}) | 角色: {} | 请求参数列表: {}",
                     request.getServletPath(), request.getMethod(), request.getRemoteAddr(),

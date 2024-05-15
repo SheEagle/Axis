@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.entity.dto.Client;
 import com.example.entity.vo.request.ClientDetailsVO;
 import com.example.entity.vo.request.RuntimeDetailsVO;
+import com.example.entity.vo.response.ClientPreviewVO;
+
+import java.util.List;
 
 public interface ClientService extends IService<Client> {
     boolean verifyAndRegister(String token);
@@ -15,6 +18,8 @@ public interface ClientService extends IService<Client> {
     Client findClientByToken(String token);
 
     void updateClientDetail(ClientDetailsVO vo, Client client);
+
+    List<ClientPreviewVO> listClients();
 
     void updateRuntimeDetails(RuntimeDetailsVO vo, Client client);
 }

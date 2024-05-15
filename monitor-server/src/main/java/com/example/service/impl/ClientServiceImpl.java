@@ -6,6 +6,7 @@ import com.example.entity.dto.Client;
 import com.example.entity.dto.ClientDetails;
 import com.example.entity.vo.request.ClientDetailsVO;
 import com.example.entity.vo.request.RuntimeDetailsVO;
+import com.example.entity.vo.response.ClientPreviewVO;
 import com.example.mapper.ClientDetailsMapper;
 import com.example.mapper.ClientMapper;
 import com.example.service.ClientService;
@@ -16,10 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -81,6 +79,25 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         } else {
             clientDetailsMapper.insert(details);
         }
+    }
+
+    @Override
+    public List<ClientPreviewVO> listClients() {
+
+        return clientIdCache.values().stream().map(client -> {
+            ClientPreviewVO vo = client.asViewObject(ClientPreviewVO.class);
+            BeanUtils.copyProperties(clientDetailsMapper.selectById(vo.getId()), vo);
+            RuntimeDetailsVO runtime = currentRuntime.get(client.getId());
+            if (this.isOnline(runtime)) {
+                BeanUtils.copyProperties(runtime, vo);
+                vo.setOnline(true);
+            }
+            return vo;
+        }).toList();
+    }
+
+    private boolean isOnline(RuntimeDetailsVO runtime) {
+        return runtime != null && System.currentTimeMillis() - runtime.getTimestamp() < 60 * 1000;
     }
 
     private Map<Integer, RuntimeDetailsVO> currentRuntime = new ConcurrentHashMap<>();
