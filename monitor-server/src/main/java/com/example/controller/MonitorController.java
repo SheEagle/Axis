@@ -1,12 +1,12 @@
 package com.example.controller;
 
 import com.example.entity.RestBean;
+import com.example.entity.vo.request.RenameClientVO;
 import com.example.entity.vo.response.ClientPreviewVO;
 import com.example.service.ClientService;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,5 +20,12 @@ public class MonitorController {
     public RestBean<List<ClientPreviewVO>> listAllClient() {
         return RestBean.success(service.listClients());
     }
+
+    @PostMapping("/rename")
+    public RestBean<Void> renameClient(@RequestBody @Valid RenameClientVO vo) {
+        service.renameClient(vo);
+        return RestBean.success();
+    }
+
 
 }

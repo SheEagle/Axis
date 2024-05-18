@@ -1,10 +1,12 @@
 package com.example.service.impl;
 
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.Client;
 import com.example.entity.dto.ClientDetails;
 import com.example.entity.vo.request.ClientDetailsVO;
+import com.example.entity.vo.request.RenameClientVO;
 import com.example.entity.vo.request.RuntimeDetailsVO;
 import com.example.entity.vo.response.ClientPreviewVO;
 import com.example.mapper.ClientDetailsMapper;
@@ -107,6 +109,12 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     public void updateRuntimeDetails(RuntimeDetailsVO vo, Client client) {
         currentRuntime.put(client.getId(), vo);
         influx.writeRuntimeData(client.getId(), vo);
+    }
+
+    @Override
+    public void renameClient(RenameClientVO vo) {
+        this.update(Wrappers.<Client>update().eq("id", vo.getId()).set("name", vo.getName()));
+        this.initClientCache();
     }
 
     private void addClientCache(Client client) {

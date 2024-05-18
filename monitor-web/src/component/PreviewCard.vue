@@ -5,6 +5,7 @@ const props = defineProps({
   data: Object,
   update: Function
 })
+
 </script>
 
 <template>
@@ -14,7 +15,7 @@ const props = defineProps({
         <div class="name">
           <span :class="`flag-icon flag-icon-${data.location}`"></span>
           <span style="margin: 0 10px">{{ data.name }}</span>
-          <i class="fa-solid fa-pen-to-square"></i>
+          <i class="fa-solid fa-pen-to-square interact-item" @click.stop="rename(data.id, data.name, update)"></i>
         </div>
 
         <div class="os">
