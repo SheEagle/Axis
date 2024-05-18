@@ -1,14 +1,26 @@
 <script setup>
 
 import PreviewCard from "@/component/PreviewCard.vue";
-import {ref} from "vue";
+import {reactive, ref} from "vue";
 import {get} from "@/net";
+import ClientDetails from "@/component/ClientDetails.vue";
 
 const list = ref([])
 
 const updateList = () => get('api/monitor/list', data => list.value = data)
 setInterval(updateList, 10000)
 updateList()
+
+const details = reactive({
+  show: false,
+  id: -1
+})
+
+const displayClientDetails = (id) => {
+  details.show = true
+  details.id = id
+}
+
 </script>
 
 <template>
@@ -18,9 +30,16 @@ updateList()
     <el-divider style="margin: 10px 0"></el-divider>
 
     <div class="card-list">
-      <preview-card v-for="item in list" :data="item" :update="updateList"></preview-card>
+      <preview-card v-for="item in list" :data="item" :update="updateList"
+                    @click="displayClientDetails(item.id)"></preview-card>
+
 
     </div>
+
+    <el-drawer size="520" :show-close="false" v-model="details.show"
+               :with-header="false" v-if="list.length" @close="details.id = -1">
+      <client-details :id="details.id" :update="updateList"></client-details>
+    </el-drawer>
 
 
   </div>

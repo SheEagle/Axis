@@ -7,7 +7,9 @@ import com.example.entity.dto.Client;
 import com.example.entity.dto.ClientDetails;
 import com.example.entity.vo.request.ClientDetailsVO;
 import com.example.entity.vo.request.RenameClientVO;
+import com.example.entity.vo.request.RenameNodeVO;
 import com.example.entity.vo.request.RuntimeDetailsVO;
+import com.example.entity.vo.response.ClientDetailsResponseVO;
 import com.example.entity.vo.response.ClientPreviewVO;
 import com.example.mapper.ClientDetailsMapper;
 import com.example.mapper.ClientMapper;
@@ -116,6 +118,22 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         this.update(Wrappers.<Client>update().eq("id", vo.getId()).set("name", vo.getName()));
         this.initClientCache();
     }
+
+    @Override
+    public void renameNode(RenameNodeVO vo) {
+        this.update(Wrappers.<Client>update().eq("id", vo.getId())
+                .set("node", vo.getNode()).set("location", vo.getLocation()));
+        this.initClientCache();
+    }
+
+    @Override
+    public ClientDetailsResponseVO clientDetails(Integer clientId) {
+        ClientDetailsResponseVO vo = this.clientIdCache.get(clientId).asViewObject(ClientDetailsResponseVO.class);
+        BeanUtils.copyProperties(clientDetailsMapper.selectById(clientId), vo);
+        vo.setOnline(this.isOnline(currentRuntime.get(clientId)));
+        return vo;
+    }
+
 
     private void addClientCache(Client client) {
         clientIdCache.put(client.getId(), client);
