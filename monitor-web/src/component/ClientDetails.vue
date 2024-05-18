@@ -1,8 +1,9 @@
 <script setup>
-import {reactive, watch} from "vue";
+import {computed, reactive, watch} from "vue";
 import {get, post} from "@/net";
-import {copyIp, cpuNameToImage, osNameToIcon, percentageToStatus, rename} from "@/tools";
+import {copyIp, cpuNameToImage, osNameToIcon, percentageToStatus, rename, fitByUnit} from "@/tools";
 import {ElMessage} from "element-plus";
+
 
 const locations = [
   {name: 'cn', desc: '中国大陆'},
@@ -44,8 +45,10 @@ const props = defineProps({
 
 const details = reactive({
   base: {},
-  runtime: {},
-  editNode: false
+  runtime: {
+    list: []
+  },
+  editNode: false,
 })
 
 function updateDetails() {
@@ -57,9 +60,22 @@ function updateDetails() {
 const init = id => {
   if (id !== -1) {
     details.base = {}
+    details.runtime = {list: []}
     get(`/api/monitor/details?clientId=${id}`, data => Object.assign(details.base, data))
+    get(`/api/monitor/runtime-history?clientId=${id}`, data => Object.assign(details.runtime, data))
   }
 }
+
+setInterval(() => {
+  if (props.id !== -1 && details.runtime) {
+    get(`/api/monitor/runtime-now?clientId=${props.id}`, data => {
+      details.runtime.list.splice(0, 1)
+      details.runtime.list.push(data)
+    })
+  }
+}, 10000)
+
+const now = computed(() => details.runtime.list[details.runtime.list.length - 1])
 
 watch(() => props.id, init, {immediate: true})
 
@@ -166,19 +182,20 @@ watch(() => props.id, init, {immediate: true})
 
       <el-divider style="margin: 10px 0"/>
 
-      <div v-if="details.base.online">
-        <div style="display: flex">
-          <el-progress type="dashboard" :width="100" :percentage="20"
-          >
+      <div v-if="details.base.online" v-loading="!details.runtime.list.length">
+        <div style="display: flex" v-if="details.runtime.list.length">
+          <el-progress type="dashboard" :width="100" :percentage="now.cpuUsage*100"
+                       :status="percentageToStatus(now.cpuUsage*100)">
             <div style="font-size: 17px;font-weight: bold;color: initial">CPU</div>
-            <div style="font-size: 13px;color: grey;margin-top: 5px">20%</div>
+            <div style="font-size: 13px;color: grey;margin-top: 5px">{{ (now.cpuUsage * 100).toFixed(1) }}%</div>
           </el-progress>
 
           <el-progress style="margin-left: 20px" type="dashboard" :width="100"
-                       :percentage="60"
+                       :percentage="now.memoryUsage/details.runtime.memory*100"
+                       :status="percentageToStatus(now.memoryUsage/details.runtime.memory*100)"
           >
             <div style="font-size: 16px;font-weight: bold;color: initial">内存</div>
-            <div style="font-size: 13px;color: grey;margin-top: 5px">28.6 GB</div>
+            <div style="font-size: 13px;color: grey;margin-top: 5px">{{ (now.memoryUsage).toFixed(1) }}GB</div>
           </el-progress>
 
           <div style="flex: 1;margin-left: 30px;display: flex;flex-direction: column;height: 80px">
@@ -186,10 +203,10 @@ watch(() => props.id, init, {immediate: true})
               <div>实时网络速度</div>
               <div>
                 <i style="color: orange" class="fa-solid fa-arrow-up"></i>
-                <span>{{ ` 20KB/s` }}</span>
+                <span>{{ ` ${fitByUnit(now.networkUpload, 'KB')}/s` }}</span>
                 <el-divider direction="vertical"/>
                 <i style="color: dodgerblue" class="fa-solid fa-arrow-down"></i>
-                <span>{{ ` 0KB/s` }}</span>
+                <span>{{ ` ${fitByUnit(now.networkDownload, 'KB')}/s` }}</span>
               </div>
             </div>
 
@@ -199,10 +216,11 @@ watch(() => props.id, init, {immediate: true})
                   <i class="fa-solid fa-hard-drive"></i>
                   <span> 磁盘总容量</span>
                 </div>
-                <div>10 GB / 30 GB</div>
+                <div>{{ now.diskUsage.toFixed(1) }} GB / {{ details.runtime.disk.toFixed(1) }} GB</div>
               </div>
               <el-progress type="line" :show-text="false"
-                           :percentage="20"/>
+                           :status="percentageToStatus(now.diskUsage / details.runtime.disk * 100)"
+                           :percentage="now.diskUsage / details.runtime.disk * 100"/>
             </div>
           </div>
 
@@ -210,6 +228,7 @@ watch(() => props.id, init, {immediate: true})
       </div>
 
       <el-empty description="服务器处于离线状态，请检查服务器是否正常运行" v-else/>
+
 
     </div>
   </div>

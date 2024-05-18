@@ -11,6 +11,7 @@ import com.example.entity.vo.request.RenameNodeVO;
 import com.example.entity.vo.request.RuntimeDetailsVO;
 import com.example.entity.vo.response.ClientDetailsResponseVO;
 import com.example.entity.vo.response.ClientPreviewVO;
+import com.example.entity.vo.response.RuntimeHistoryVO;
 import com.example.mapper.ClientDetailsMapper;
 import com.example.mapper.ClientMapper;
 import com.example.service.ClientService;
@@ -23,7 +24,6 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 @Service
 public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> implements ClientService {
@@ -132,6 +132,19 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         BeanUtils.copyProperties(clientDetailsMapper.selectById(clientId), vo);
         vo.setOnline(this.isOnline(currentRuntime.get(clientId)));
         return vo;
+    }
+
+    @Override
+    public RuntimeHistoryVO clientRuntimeDetailsHistory(int clientId) {
+        RuntimeHistoryVO vo = influx.readRuntimeData(clientId);
+        ClientDetails details = clientDetailsMapper.selectById(clientId);
+        BeanUtils.copyProperties(details, vo);
+        return vo;
+    }
+
+    @Override
+    public RuntimeDetailsVO clientRuntimeDetailsNow(int clientId) {
+        return currentRuntime.get(clientId);
     }
 
 

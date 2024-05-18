@@ -8,6 +8,7 @@ import com.example.entity.vo.request.RenameNodeVO;
 import com.example.entity.vo.request.RuntimeDetailsVO;
 import com.example.entity.vo.response.ClientDetailsResponseVO;
 import com.example.entity.vo.response.ClientPreviewVO;
+import com.example.entity.vo.response.RuntimeHistoryVO;
 
 import java.util.List;
 
@@ -31,4 +32,8 @@ public interface ClientService extends IService<Client> {
     void renameNode(RenameNodeVO vo);
 
     ClientDetailsResponseVO clientDetails(Integer clientId);
+
+    RuntimeHistoryVO clientRuntimeDetailsHistory(int clientId);
+
+    RuntimeDetailsVO clientRuntimeDetailsNow(int clientId);
 }
