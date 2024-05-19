@@ -1,11 +1,32 @@
 <script setup>
 
 import PreviewCard from "@/component/PreviewCard.vue";
-import {reactive, ref} from "vue";
+import {computed, reactive, ref} from "vue";
 import {get} from "@/net";
 import ClientDetails from "@/component/ClientDetails.vue";
 import RegisterCard from "@/component/RegisterCard.vue";
 import {Plus} from "@element-plus/icons-vue";
+
+
+const locations = [
+  {name: 'cn', desc: '中国大陆'},
+  {name: 'hk', desc: '香港'},
+  {name: 'jp', desc: '日本'},
+  {name: 'us', desc: '美国'},
+  {name: 'sg', desc: '新加坡'},
+  {name: 'kr', desc: '韩国'},
+  {name: 'de', desc: '德国'}
+]
+
+const checkedNodes = ref([])
+
+const clientList = computed(() => {
+  if (checkedNodes.value.length === 0) {
+    return list.value
+  } else {
+    return list.value.filter(item => checkedNodes.value.indexOf(item.location) >= 0)
+  }
+})
 
 const list = ref([])
 
@@ -48,8 +69,17 @@ const refreshToken = () => {
 
     <el-divider style="margin: 10px 0"></el-divider>
 
+    <div style="margin-bottom: 20px">
+      <el-checkbox-group v-model="checkedNodes">
+        <el-checkbox v-for="node in locations" :key="node" :label="node.name" border>
+          <span :class="`flag-icon flag-icon-${node.name}`"></span>
+          <span style="font-size: 13px;margin-left: 10px">{{ node.desc }}</span>
+        </el-checkbox>
+      </el-checkbox-group>
+    </div>
+
     <div class="card-list" v-if="list.length">
-      <preview-card v-for="item in list" :data="item" :update="updateList"
+      <preview-card v-for="item in clientList" :data="item" :update="updateList"
                     @click="displayClientDetails(item.id)"></preview-card>
     </div>
 
