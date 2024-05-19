@@ -41,6 +41,8 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
 
     @PostConstruct
     public void initClientCache() {
+        clientIdCache.clear();
+        clientTokenCache.clear();
         this.list().forEach(this::addClientCache);
     }
 
@@ -145,6 +147,14 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
     @Override
     public RuntimeDetailsVO clientRuntimeDetailsNow(int clientId) {
         return currentRuntime.get(clientId);
+    }
+
+    @Override
+    public void deleteClient(int clientId) {
+        this.removeById(clientId);
+        clientDetailsMapper.deleteById(clientId);
+        this.initClientCache();
+        currentRuntime.remove(clientId);
     }
 
 

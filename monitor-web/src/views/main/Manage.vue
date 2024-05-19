@@ -4,6 +4,8 @@ import PreviewCard from "@/component/PreviewCard.vue";
 import {reactive, ref} from "vue";
 import {get} from "@/net";
 import ClientDetails from "@/component/ClientDetails.vue";
+import RegisterCard from "@/component/RegisterCard.vue";
+import {Plus} from "@element-plus/icons-vue";
 
 const list = ref([])
 
@@ -21,24 +23,48 @@ const displayClientDetails = (id) => {
   details.id = id
 }
 
+const register = reactive({
+  show: false,
+  token: ''
+})
+
+const refreshToken = () => {
+  get('/api/monitor/register', token => register.token = token)
+}
+
 </script>
 
 <template>
   <div class="manage-main">
-    <div class="title"><i class="fa-solid fa-server"></i> 管理主机列表</div>
-    <div class="desc">在这里管理所有已经注册的主机实例，实时监控主机运行状态，快速进行管理和操作。</div>
+    <div style="display: flex;justify-content: space-between;align-content: end">
+      <div>
+        <div class="title"><i class="fa-solid fa-server"></i> 管理主机列表</div>
+        <div class="desc">在这里管理所有已经注册的主机实例，实时监控主机运行状态，快速进行管理和操作。</div>
+      </div>
+      <div>
+        <el-button :icon="Plus" type="primary" plain @click="register.show=true">添加新主机</el-button>
+      </div>
+    </div>
+
     <el-divider style="margin: 10px 0"></el-divider>
 
-    <div class="card-list">
+    <div class="card-list" v-if="list.length">
       <preview-card v-for="item in list" :data="item" :update="updateList"
                     @click="displayClientDetails(item.id)"></preview-card>
-
-
     </div>
+
+    <el-empty description="还没有任何主机哦，点击右上角添加一个吧" v-else>
+
+    </el-empty>
 
     <el-drawer size="520" :show-close="false" v-model="details.show"
                :with-header="false" v-if="list.length" @close="details.id = -1">
-      <client-details :id="details.id" :update="updateList"></client-details>
+      <client-details :id="details.id" :update="updateList" @delete="updateList"></client-details>
+    </el-drawer>
+
+    <el-drawer v-model="register.show" direction="btt" style="width: 600px;margin: 10px auto" size="360"
+               @open="refreshToken">
+      <register-card :token="register.token"></register-card>
     </el-drawer>
 
 
