@@ -11,6 +11,7 @@ import com.example.entity.vo.request.RenameNodeVO;
 import com.example.entity.vo.request.RuntimeDetailsVO;
 import com.example.entity.vo.response.ClientDetailsResponseVO;
 import com.example.entity.vo.response.ClientPreviewVO;
+import com.example.entity.vo.response.ClientSimpleVO;
 import com.example.entity.vo.response.RuntimeHistoryVO;
 import com.example.mapper.ClientDetailsMapper;
 import com.example.mapper.ClientMapper;
@@ -155,6 +156,15 @@ public class ClientServiceImpl extends ServiceImpl<ClientMapper, Client> impleme
         clientDetailsMapper.deleteById(clientId);
         this.initClientCache();
         currentRuntime.remove(clientId);
+    }
+
+    @Override
+    public List<ClientSimpleVO> listSimpleList() {
+        return clientIdCache.values().stream().map(client -> {
+            ClientSimpleVO vo = client.asViewObject(ClientSimpleVO.class);
+            BeanUtils.copyProperties(clientDetailsMapper.selectById(vo.getId()), vo);
+            return vo;
+        }).toList();
     }
 
 

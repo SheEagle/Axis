@@ -1,10 +1,13 @@
 package com.example.service.impl;
 
+import com.alibaba.fastjson2.JSONArray;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.entity.dto.Account;
 import com.example.entity.vo.request.ConfirmResetVO;
+import com.example.entity.vo.request.CreateSubAccountVO;
 import com.example.entity.vo.request.EmailResetVO;
+import com.example.entity.vo.response.SubAccountVO;
 import com.example.mapper.AccountMapper;
 import com.example.service.AccountService;
 import com.example.utils.Const;
@@ -19,6 +22,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -129,6 +134,34 @@ public class AccountServiceImpl extends ServiceImpl<AccountMapper, Account> impl
             return false;
         this.update(Wrappers.<Account>update().eq("id", id).set("password", passwordEncoder.encode(newPass)));
         return true;
+    }
+
+    @Override
+    public List<SubAccountVO> listSubAccount() {
+        return this.list(Wrappers.<Account>query().eq("role", Const.ROLE_NORMAL))
+                .stream().map(account -> {
+                    SubAccountVO vo = account.asViewObject(SubAccountVO.class);
+                    vo.setClientList(JSONArray.parse(account.getClients()));
+                    return vo;
+                }).toList();
+    }
+
+    @Override
+    public void createSubAccount(CreateSubAccountVO vo) {
+        Account account = this.findAccountByNameOrEmail(vo.getEmail());
+        if (account != null)
+            throw new IllegalArgumentException("该电子邮件已被注册");
+        account = this.findAccountByNameOrEmail(vo.getUsername());
+        if (account != null)
+            throw new IllegalArgumentException("该用户名已被注册");
+        account = new Account(null, vo.getUsername(), passwordEncoder.encode(vo.getPassword()),
+                vo.getEmail(), Const.ROLE_NORMAL, new Date(), JSONArray.copyOf(vo.getClients()).toJSONString());
+        this.save(account);
+    }
+
+    @Override
+    public void deleteSubAccount(int uid) {
+        this.removeById(uid);
     }
 
     /**

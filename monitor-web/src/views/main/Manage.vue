@@ -7,6 +7,7 @@ import ClientDetails from "@/component/ClientDetails.vue";
 import RegisterCard from "@/component/RegisterCard.vue";
 import {Plus} from "@element-plus/icons-vue";
 import {useRoute} from "vue-router";
+import {useStore} from "@/store";
 
 
 const locations = [
@@ -20,7 +21,7 @@ const locations = [
 ]
 
 const checkedNodes = ref([])
-
+const store = useStore()
 const route = useRoute()
 
 const clientList = computed(() => {
@@ -34,7 +35,7 @@ const clientList = computed(() => {
 const list = ref([])
 
 const updateList = () => {
-  if(route.name==='manage'){
+  if (route.name === 'manage') {
     get('api/monitor/list', data => list.value = data)
   }
 }
@@ -70,7 +71,9 @@ const refreshToken = () => {
         <div class="desc">在这里管理所有已经注册的主机实例，实时监控主机运行状态，快速进行管理和操作。</div>
       </div>
       <div>
-        <el-button :icon="Plus" type="primary" plain @click="register.show=true">添加新主机</el-button>
+        <el-button :icon="Plus" type="primary" plain :disabled="!store.isAdmin"
+                   @click="register.show = true">添加新主机
+        </el-button>
       </div>
     </div>
 
