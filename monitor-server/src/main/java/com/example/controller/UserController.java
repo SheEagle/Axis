@@ -3,6 +3,7 @@ package com.example.controller;
 import com.example.entity.RestBean;
 import com.example.entity.vo.request.ChangePasswordVO;
 import com.example.entity.vo.request.CreateSubAccountVO;
+import com.example.entity.vo.request.ModifyEmailVO;
 import com.example.entity.vo.response.SubAccountVO;
 import com.example.service.AccountService;
 import com.example.utils.Const;
@@ -35,7 +36,7 @@ public class UserController {
     @GetMapping("/sub/delete")
     public RestBean<Void> deleteSubAccount(int uid,
                                            @RequestAttribute(Const.ATTR_USER_ID) int userId) {
-        if(uid == userId)
+        if (uid == userId)
             return RestBean.failure(401, "非法参数");
         service.deleteSubAccount(uid);
         return RestBean.success();
@@ -47,8 +48,16 @@ public class UserController {
         return RestBean.success(service.listSubAccount());
     }
 
-
-
+    @PostMapping("/modify-email")
+    public RestBean<Void> modifyEmail(@RequestAttribute(Const.ATTR_USER_ID) int id,
+                                      @RequestBody @Valid ModifyEmailVO vo) {
+        String result = service.modifyEmail(id, vo);
+        if(result == null) {
+            return RestBean.success();
+        } else {
+            return RestBean.failure(401, result);
+        }
+    }
 
 
 }

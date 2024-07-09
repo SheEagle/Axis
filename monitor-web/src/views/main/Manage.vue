@@ -61,6 +61,17 @@ const refreshToken = () => {
   get('/api/monitor/register', token => register.token = token)
 }
 
+function openTerminal(id) {
+  terminal.show = true
+  terminal.id = id
+  details.show = false
+}
+
+const terminal = reactive({
+  show: false,
+  id: -1
+})
+
 </script>
 
 <template>
@@ -99,13 +110,28 @@ const refreshToken = () => {
 
     <el-drawer size="520" :show-close="false" v-model="details.show"
                :with-header="false" v-if="list.length" @close="details.id = -1">
-      <client-details :id="details.id" :update="updateList" @delete="updateList"></client-details>
+      <client-details :id="details.id" :update="updateList" @delete="updateList"
+                      @terminal="openTerminal"></client-details>
     </el-drawer>
 
     <el-drawer v-model="register.show" direction="btt" style="width: 600px;margin: 10px auto" size="360"
                @open="refreshToken">
       <register-card :token="register.token"></register-card>
     </el-drawer>
+
+    <!--<el-drawer style="width: 800px" :size="520" direction="btt"-->
+    <!--           @close="terminal.id = -1"-->
+    <!--           v-model="terminal.show" :close-on-click-modal="false">-->
+    <!--  <template #header>-->
+    <!--    <div>-->
+    <!--      <div style="font-size: 18px;color: dodgerblue;font-weight: bold;">SSH远程连接</div>-->
+    <!--      <div style="font-size: 14px">-->
+    <!--        远程连接的建立将由服务端完成，因此在内网环境下也可以正常使用。-->
+    <!--      </div>-->
+    <!--    </div>-->
+    <!--  </template>-->
+    <!--  &lt;!&ndash;<terminal-window :id="terminal.id"/>&ndash;&gt;-->
+    <!--</el-drawer>-->
 
 
   </div>
