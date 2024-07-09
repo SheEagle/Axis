@@ -6,8 +6,8 @@ import org.hibernate.validator.constraints.Length;
 
 @Data
 public class SshConnectionVO {
-    int id;
-    int port;
+    Integer id;
+    Integer port;
     @NotNull
     @Length(min = 1)
     String username;

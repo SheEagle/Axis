@@ -82,7 +82,7 @@ const now = computed(() => details.runtime.list[details.runtime.list.length - 1]
 watch(() => props.id, init, {immediate: true})
 
 
-const emits = defineEmits(['delete'])
+const emits = defineEmits(['delete', 'terminal'])
 
 function deleteClient() {
   ElMessageBox.confirm('删除此主机后所有统计数据都将丢失，您确定要这样做吗？', '删除主机', {
@@ -111,7 +111,8 @@ function deleteClient() {
             服务器信息
           </div>
           <el-button :icon="Connection" type="info"
-                     @click="emits('terminal', id)" plain text>SSH远程连接</el-button>
+                     @click="emits('terminal', id)" plain text>SSH远程连接
+          </el-button>
           <el-button :icon="Delete" type="danger" style="margin-left: 0"
                      plain text @click="deleteClient">删除此主机
           </el-button>
